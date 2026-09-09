@@ -1,0 +1,38 @@
+{
+  "Capesize": {
+    "current_rate_usd_day": 61512.0,
+    "forecasts": {
+      "7 days": 67924.35,
+      "14 days": 60943.06,
+      "30 days": 34689.57
+    },
+    "signal": "WAIT"
+  },
+  "Handysize": {
+    "current_rate_usd_day": 15709.0,
+    "forecasts": {
+      "7 days": 15875.54,
+      "14 days": 15331.99,
+      "30 days": 12909.8
+    },
+    "signal": "WAIT"
+  },
+  "Panamax": {
+    "current_rate_usd_day": 23233.0,
+    "forecasts": {
+      "7 days": 24191.12,
+      "14 days": 21641.9,
+      "30 days": 21529.16
+    },
+    "signal": "WAIT"
+  },
+  "Supramax": {
+    "current_rate_usd_day": 21438.0,
+    "forecasts": {
+      "7 days": 22267.71,
+      "14 days": 21295.23,
+      "30 days": 19615.69
+    },
+    "signal": "WAIT"
+  }
+}

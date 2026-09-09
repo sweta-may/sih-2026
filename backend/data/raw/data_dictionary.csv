@@ -1,0 +1,53 @@
+table_name,column_name,description
+freight_data,index_code,Baltic benchmark/index identifier
+freight_data,vessel_class,"Handysize, Supramax, Panamax or Capesize"
+freight_data,route_code,Baltic route code
+freight_data,unit,USD/day or USD/tonne
+freight_data,route_description,Human-readable route
+freight_data,source,Data provider
+freight_data,data_status,Whether licensed historical values still need ingestion
+vessel_data,vessel_id,Internal benchmark vessel ID
+vessel_data,vessel_class,Dry bulk class
+vessel_data,dwt_mt,Deadweight tonnes
+vessel_data,loa_m,"Length overall, metres"
+vessel_data,beam_m,"Beam, metres"
+vessel_data,draft_m,"Reference draft, metres"
+vessel_data,reference_note,Interpretation of benchmark
+port_data,port_id,Stable internal port ID
+port_data,port_name,Port/approach name
+port_data,state,Indian state
+port_data,port_type,Port or anchorage/channel
+port_data,max_draft_m,Cited screening maximum draft
+port_data,max_loa_m,Cited screening maximum LOA
+port_data,max_beam_m,Cited screening maximum beam
+port_data,cargo_capacity_mmtpa,Capacity/throughput where available
+port_data,constraint_note,Caveats on berth/tide/operations
+port_calls,imo,IMO vessel identifier
+port_calls,mmsi,AIS vessel identifier
+port_calls,locode,UN/LOCODE port identifier
+port_calls,event,ARRIVAL or DEPARTURE
+port_calls,timestamp_utc,Event timestamp in UTC
+port_calls,last_port,Previous port
+port_calls,last_port_departure_utc,Previous-port departure timestamp
+congestion_data,waiting_hours,"Waiting before berth, hours"
+congestion_data,berth_time_hours,"Time at berth, hours"
+congestion_data,total_port_time_hours,Arrival-to-departure port time
+congestion_data,ships_observed,Count in aggregation
+congestion_data,berth_occupancy_pct,Berth occupancy percentage
+commodity_data,month,YYYY-MM observation month
+commodity_data,trade_type,Import or Export
+commodity_data,state_name,Indian state
+commodity_data,port,Port name
+commodity_data,country,Trade partner country
+commodity_data,hs2_code,2-digit HS commodity code
+commodity_data,commodity,Commodity name
+commodity_data,quantity,Trade quantity
+commodity_data,dollars_value,Trade value in USD
+commodity_data,inr_value,Trade value in INR
+ais_positions,timestamp_utc,AIS observation timestamp
+ais_positions,lat,WGS84 latitude
+ais_positions,lon,WGS84 longitude
+ais_positions,speed_knots,Speed over ground
+ais_positions,draught_m,Current vessel draught
+ais_positions,destination,AIS-entered destination
+ais_positions,eta_utc,ETA

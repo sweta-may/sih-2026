@@ -1,0 +1,7 @@
+source,data_product,target_table,access,frequency,main_use,url
+Baltic Exchange,Dry bulk freight rates,freight_data,Licensed/paid,Historical; daily spot and forward,Capesize/Panamax/Supramax/Handysize,https://www.balticexchange.com/en/data-services/market-information0/dry-services.html
+UNCTADstat,Seaborne trade + port calls/performance,commodity_data / port_calls / congestion_data,Public,Annual/semi-annual datasets,"Trade volumes, port calls, time in port",https://unctadstat.unctad.org/datacentre/
+World Bank Pink Sheet,Coal + crude/fuel market indicators,commodity_data,Public,Monthly/annual,Commodity price history,https://www.worldbank.org/en/research/commodity-markets
+VesselFinder,AIS + port calls + vessel particulars,ais_positions / port_calls / vessel_data,API/paid,Near-real-time + API history by plan,"Position, speed, draught, ETA, arrival/departure, DWT/dimensions",https://www.vesselfinder.com/
+MarineTraffic,AIS tracking / vessel activity,ais_positions / port_calls,API/paid,Live/historical by plan,Vessel movements and port activity,https://www.marinetraffic.com/en/ais/home/
+India Data Portal,Port-level imports/exports,commodity_data,Public,Monthly,"Port, country, commodity, quantity, USD/INR value",https://ckandev.indiadataportal.com/dataset/export-imports-port-level
