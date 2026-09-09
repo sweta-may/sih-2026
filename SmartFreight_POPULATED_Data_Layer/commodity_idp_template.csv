@@ -1,0 +1,7 @@
+period,trade_type,state_name,state_code,port,country,hs2_code,commodity,source,data_status
+TEMPLATE,Import,Odisha,OD,Paradip,,,,India Data Portal,SCHEMA_ONLY
+TEMPLATE,Import,Andhra Pradesh,AP,Visakhapatnam,,,,India Data Portal,SCHEMA_ONLY
+TEMPLATE,Import,Andhra Pradesh,AP,Gangavaram,,,,India Data Portal,SCHEMA_ONLY
+TEMPLATE,Import,Odisha,OD,Gopalpur,,,,India Data Portal,SCHEMA_ONLY
+TEMPLATE,Import,Odisha,OD,Dhamra,,,,India Data Portal,SCHEMA_ONLY
+TEMPLATE,Import,West Bengal,WB,Haldia,,,,India Data Portal,SCHEMA_ONLY

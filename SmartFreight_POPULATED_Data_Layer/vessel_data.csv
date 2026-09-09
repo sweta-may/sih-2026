@@ -1,0 +1,5 @@
+vessel_id,vessel_class,dwt_mt,loa_m,beam_m,draft_m,reference_note,source,data_status
+BALTIC-CAPESIZE,Capesize,180000,290.0,45.0,18.2,Baltic benchmark vessel,Baltic Exchange,REFERENCE_ACTUAL
+BALTIC-PANAMAX,Panamax,82500,229.0,32.25,14.43,Baltic benchmark vessel,Baltic Exchange,REFERENCE_ACTUAL
+BALTIC-SUPRAMAX,Supramax,58328,189.99,32.26,12.8,Baltic benchmark vessel,Baltic Exchange,REFERENCE_ACTUAL
+BALTIC-HANDYSIZE,Handysize,38200,180.0,29.8,10.538,Baltic benchmark vessel,Baltic Exchange,REFERENCE_ACTUAL

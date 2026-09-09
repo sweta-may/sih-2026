@@ -1,0 +1,24 @@
+period,scope,commodity,unit,value,source,data_status
+2023,Global,"Coal, Australia",USD/mt,172.8,World Bank Pink Sheet,PUBLIC_ACTUAL
+2024,Global,"Coal, Australia",USD/mt,136.1,World Bank Pink Sheet,PUBLIC_ACTUAL
+2025,Global,"Coal, Australia",USD/mt,108.4,World Bank Pink Sheet,PUBLIC_ACTUAL
+2023,Global,"Coal, South Africa",USD/mt,119.1,World Bank Pink Sheet,PUBLIC_ACTUAL
+2024,Global,"Coal, South Africa",USD/mt,105.8,World Bank Pink Sheet,PUBLIC_ACTUAL
+2025,Global,"Coal, South Africa",USD/mt,94.9,World Bank Pink Sheet,PUBLIC_ACTUAL
+2023,Global,"Crude oil, average",USD/bbl,80.8,World Bank Pink Sheet,PUBLIC_ACTUAL
+2024,Global,"Crude oil, average",USD/bbl,78.7,World Bank Pink Sheet,PUBLIC_ACTUAL
+2025,Global,"Crude oil, average",USD/bbl,67.4,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-01,Global,"Coal, Australia",USD/mt,109.8,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-02,Global,"Coal, Australia",USD/mt,118.4,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-03,Global,"Coal, Australia",USD/mt,138.6,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-04,Global,"Coal, Australia",USD/mt,130.9,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-05,Global,"Coal, Australia",USD/mt,136.9,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-01,Global,"Coal, South Africa",USD/mt,90.6,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-02,Global,"Coal, South Africa",USD/mt,91.2,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-03,Global,"Coal, South Africa",USD/mt,93.8,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-04,Global,"Coal, South Africa",USD/mt,94.8,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-05,Global,"Coal, South Africa",USD/mt,95.6,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-01,Global,"Crude oil, average",USD/bbl,63.7,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-03,Global,"Crude oil, average",USD/bbl,95.6,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-04,Global,"Crude oil, average",USD/bbl,103.9,World Bank Pink Sheet,PUBLIC_ACTUAL
+2026-05,Global,"Crude oil, average",USD/bbl,100.4,World Bank Pink Sheet,PUBLIC_ACTUAL
