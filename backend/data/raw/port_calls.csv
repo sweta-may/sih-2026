@@ -1,0 +1,1 @@
+port_call_id,imo,mmsi,locode,port_id,event,timestamp_utc,arrival_lat,arrival_lon,departure_lat,departure_lon,last_port,last_port_departure_utc,source,quality_flag

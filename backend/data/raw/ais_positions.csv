@@ -1,0 +1,1 @@
+timestamp_utc,mmsi,imo,vessel_name,lat,lon,course_deg,speed_knots,heading_deg,nav_status,draught_m,destination,eta_ais,eta_utc,ais_source,quality_flag

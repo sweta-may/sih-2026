@@ -1,0 +1,8 @@
+port_id,port_name,state,country,port_type,max_draft_m,max_loa_m,max_beam_m,cargo_capacity_mmtpa,constraint_note,source
+INPRD,Paradip,Odisha,India,port,16.5,300.0,46.0,289.0,Use berth-specific limits for final vessel feasibility.,Paradip Port Authority
+INVTZ,Visakhapatnam,Andhra Pradesh,India,port,18.1,300.0,50.0,82.62,"82.62 is FY2024-25 cargo handled, not design capacity.",Visakhapatnam Port Authority
+INGGV,Gangavaram,Andhra Pradesh,India,port,18.0,355.0,50.0,,High-end screening reference; berth-specific limits should override.,Gangavaram berthing policy / maritime reference
+INGPR,Gopalpur,Odisha,India,port,14.2,240.0,36.0,,Fair-weather maximum; foul-weather draft is lower.,Gopalpur Ports
+INDHM,Dhamra,Odisha,India,port,18.0,350.0,50.0,,High-end screening reference; use berth-level data when available.,Dhamra port references
+INSAG,Sagar-Sandheads,West Bengal,India,anchorage_channel,,,,,Approach/anchorage; not a conventional cargo berth.,Sagarmala / maritime references
+INHLD,Haldia,West Bengal,India,port,12.2,239.0,32.3,,Berth and tide dependent; use current berth-level values.,Syama Prasad Mookerjee Port Authority

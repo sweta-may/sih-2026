@@ -1,0 +1,17 @@
+index_code,vessel_class,route_code,unit,route_description,source,data_status
+BPI82,Panamax,P1A_82,USD/day,Skaw-Gib transatlantic round voyage,Baltic Exchange,licensed_historical_required
+BPI82,Panamax,P2A_82,USD/day,Skaw-Gib trip to HK-S Korea incl Taiwan,Baltic Exchange,licensed_historical_required
+BPI82,Panamax,P3A_82,USD/day,Hong Kong-South Korea transpacific round voyage,Baltic Exchange,licensed_historical_required
+BPI82,Panamax,P4_82,USD/day,Hong Kong-South Korea trip to Skaw-Passero,Baltic Exchange,licensed_historical_required
+BPI82,Panamax,P6_82,USD/day,Singapore round voyage via Atlantic,Baltic Exchange,licensed_historical_required
+BCI,Capesize,C2,USD/tonne,Tubarao-Rotterdam,Baltic Exchange,licensed_historical_required
+BCI,Capesize,C3,USD/tonne,Tubarao-Qingdao,Baltic Exchange,licensed_historical_required
+BCI,Capesize,C5,USD/tonne,West Australia-Qingdao,Baltic Exchange,licensed_historical_required
+BCI,Capesize,C7,USD/tonne,Bolivar-Rotterdam,Baltic Exchange,licensed_historical_required
+BCI,Capesize,C17,USD/tonne,Saldanha Bay-Qingdao,Baltic Exchange,licensed_historical_required
+BSI63,Supramax,S1B,USD/day,Canakkale via Med/Black Sea to China-South Korea,Baltic Exchange,licensed_historical_required
+BSI63,Supramax,S1C,USD/day,US Gulf to China-South Japan,Baltic Exchange,licensed_historical_required
+BSI63,Supramax,S8,USD/day,South China via Indonesia to East Coast India,Baltic Exchange,licensed_historical_required
+BHSI,Handysize,HS1_38,USD/day,Skaw-Passero to Rio de Janeiro-Recalada,Baltic Exchange,licensed_historical_required
+BHSI,Handysize,HS2_38,USD/day,Skaw-Passero to Boston-Galveston,Baltic Exchange,licensed_historical_required
+BHSI,Handysize,HS5_38,USD/day,South East Asia to Singapore-Japan,Baltic Exchange,licensed_historical_required

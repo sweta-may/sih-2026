@@ -1,0 +1,1 @@
+port_id,period_start,period_end,vessel_class,cargo_segment,waiting_hours,berth_time_hours,total_port_time_hours,ships_observed,berth_occupancy_pct,source,quality_flag
