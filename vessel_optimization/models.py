@@ -153,10 +153,66 @@ class RecommendationResult:
     def to_dict(self) -> Dict[str, Any]:
         """Convert result to clean dictionary for JSON export."""
         rec_data = None
+        draft_compat = None
+        loa_compat = None
+        beam_compat = None
+        voyage_split_rec = None
+        vessel_capacity = None
+
         if self.recommended_vessel and self.recommended_voyage_plan:
+            draft_margin = (self.governing_bottlenecks.governing_draft_m - self.recommended_vessel.draft_m) if self.governing_bottlenecks.governing_draft_m is not None else None
+            loa_margin = (self.governing_bottlenecks.governing_loa_m - self.recommended_vessel.loa_m) if self.governing_bottlenecks.governing_loa_m is not None else None
+            beam_margin = (self.governing_bottlenecks.governing_beam_m - self.recommended_vessel.beam_m) if self.governing_bottlenecks.governing_beam_m is not None else None
+
+            vessel_capacity = {
+                "nominal_dwt_mt": self.recommended_vessel.dwt_mt,
+                "effective_payload_per_voyage_mt": round(self.recommended_voyage_plan.effective_payload_per_voyage_mt, 2),
+                "total_capacity_mt": round(self.recommended_voyage_plan.total_capacity_mt, 2),
+                "payload_factor": self.config.payload_factor,
+            }
+
+            draft_compat = {
+                "vessel_draft_m": self.recommended_vessel.draft_m,
+                "governing_draft_m": self.governing_bottlenecks.governing_draft_m,
+                "bottleneck_port": self.governing_bottlenecks.draft_bottleneck_port,
+                "is_compatible": True,
+                "clearance_margin_m": round(draft_margin, 2) if draft_margin is not None else None,
+            }
+
+            loa_compat = {
+                "vessel_loa_m": self.recommended_vessel.loa_m,
+                "governing_loa_m": self.governing_bottlenecks.governing_loa_m,
+                "bottleneck_port": self.governing_bottlenecks.loa_bottleneck_port,
+                "is_compatible": True,
+                "clearance_margin_m": round(loa_margin, 2) if loa_margin is not None else None,
+            }
+
+            beam_compat = {
+                "vessel_beam_m": self.recommended_vessel.beam_m,
+                "governing_beam_m": self.governing_bottlenecks.governing_beam_m,
+                "bottleneck_port": self.governing_bottlenecks.beam_bottleneck_port,
+                "is_compatible": True,
+                "clearance_margin_m": round(beam_margin, 2) if beam_margin is not None else None,
+            }
+
+            voyage_split_rec = {
+                "total_voyages": self.recommended_voyage_plan.num_voyages,
+                "cargo_per_voyage_mt": round(self.recommended_voyage_plan.cargo_per_voyage_mt, 2),
+                "total_cargo_mt": round(self.recommended_voyage_plan.total_cargo_mt, 2),
+                "capacity_utilization_pct": round(self.recommended_voyage_plan.capacity_utilization_pct, 2),
+                "deadfreight_mt": round(self.recommended_voyage_plan.deadfreight_mt, 2),
+                "note": self.recommended_voyage_plan.note,
+            }
+
             rec_data = {
                 "vessel_class": self.recommended_vessel.vessel_class,
+                "recommended_vessel_type": self.recommended_vessel.vessel_class,
+                "vessel_capacity": vessel_capacity,
                 "dwt_mt": self.recommended_vessel.dwt_mt,
+                "draft_compatibility": draft_compat,
+                "loa_compatibility": loa_compat,
+                "beam_compatibility": beam_compat,
+                "voyage_split_recommendation": voyage_split_rec,
                 "draft_m": self.recommended_vessel.draft_m,
                 "loa_m": self.recommended_vessel.loa_m,
                 "beam_m": self.recommended_vessel.beam_m,
@@ -169,13 +225,33 @@ class RecommendationResult:
 
         evals_data = {}
         for name, ev in self.candidate_evaluations.items():
+            all_checks = ev.port_compatibility.origin_checks + ev.port_compatibility.dest_checks
+            draft_pass = all(c.is_pass for c in all_checks if c.metric_name == "Draft")
+            loa_pass = all(c.is_pass for c in all_checks if c.metric_name == "LOA")
+            beam_pass = all(c.is_pass for c in all_checks if c.metric_name == "Beam")
+
             evals_data[name] = {
+                "vessel_class": ev.vessel_class.vessel_class,
+                "dwt_mt": ev.vessel_class.dwt_mt,
                 "is_eligible": ev.is_eligible,
                 "rejection_reasons": ev.rejection_reasons,
+                "draft_compatibility": {
+                    "vessel_draft_m": ev.vessel_class.draft_m,
+                    "is_pass": draft_pass,
+                },
+                "loa_compatibility": {
+                    "vessel_loa_m": ev.vessel_class.loa_m,
+                    "is_pass": loa_pass,
+                },
+                "beam_compatibility": {
+                    "vessel_beam_m": ev.vessel_class.beam_m,
+                    "is_pass": beam_pass,
+                },
                 "best_voyage_plan": {
                     "voyages": ev.best_voyage_plan.num_voyages,
                     "cargo_per_voyage_mt": round(ev.best_voyage_plan.cargo_per_voyage_mt, 2),
                     "capacity_utilization_pct": round(ev.best_voyage_plan.capacity_utilization_pct, 2),
+                    "deadfreight_mt": round(ev.best_voyage_plan.deadfreight_mt, 2),
                 } if ev.best_voyage_plan else None,
                 "rank_rationale": ev.rank_rationale
             }
