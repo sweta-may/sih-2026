@@ -15,6 +15,8 @@ from smartfreight_ais.cost_decision_engine import (
     calculate_wait_cost,
     compare_charter_now_vs_wait,
     build_decision_request_from_member5_bridge,
+    build_freight_forecast_input,
+    build_vessel_plan_input,
 )
 
 
@@ -383,4 +385,179 @@ def test_build_decision_request_from_member5_bridge():
     assert request.operations.expected_waiting_time_hours == 18.0
     assert request.operations.expected_turnaround_time_hours == 30.0
     assert request.operations.total_idle_impact_usd == 15000.0
-    assert request.operations.port_congestion_level == "HIGH"
+    assert request.operations.port_congestion_level == "HIGH"
+
+
+# ============================================================
+# FREIGHT FORECASTING ADAPTER TESTS
+# ============================================================
+
+def test_build_freight_forecast_input_from_nested_api_payload():
+    """
+    Verify conversion of Member 2 /forecast JSON response.
+    """
+    payload = {
+        "vessel_type": "Panamax",
+        "current_date": "2026-09-08",
+        "current_rate_usd_day": 22832.0,
+        "forecast": {
+            "7_days": {
+                "forecast_rate_usd_day": 22000.0,
+                "change_percent_vs_current": -3.64,
+            },
+            "14_days": {
+                "forecast_rate_usd_day": 21500.0,
+                "change_percent_vs_current": -5.83,
+            },
+            "30_days": {
+                "forecast_rate_usd_day": 21000.0,
+                "change_percent_vs_current": -8.02,
+            },
+        },
+        "recommended_entry_window": "30_days",
+        "market_entry_signal": "WAIT",
+        "model": "Random Forest",
+    }
+
+    result = build_freight_forecast_input(payload)
+    assert result.current_rate_usd_day == 22832.0
+    assert result.forecast_7d_usd_day == 22000.0
+    assert result.forecast_14d_usd_day == 21500.0
+    assert result.forecast_30d_usd_day == 21000.0
+
+
+def test_build_freight_forecast_input_from_flat_dict():
+    """
+    Verify conversion of flat dictionary with forecast rates.
+    """
+    payload = {
+        "current_rate_usd_day": 25000.0,
+        "forecast_7d_usd_day": 24000.0,
+        "forecast_14d_usd_day": 23000.0,
+        "forecast_30d_usd_day": 22000.0,
+    }
+
+    result = build_freight_forecast_input(payload)
+    assert result.current_rate_usd_day == 25000.0
+    assert result.forecast_7d_usd_day == 24000.0
+    assert result.forecast_14d_usd_day == 23000.0
+    assert result.forecast_30d_usd_day == 22000.0
+
+
+def test_build_freight_forecast_input_from_instance():
+    """
+    Verify that passing an existing FreightForecastInput returns it unchanged.
+    """
+    original = FreightForecastInput(
+        current_rate_usd_day=20000.0,
+        forecast_7d_usd_day=19500.0,
+    )
+    result = build_freight_forecast_input(original)
+    assert result is original
+
+
+def test_build_freight_forecast_input_missing_current_rate():
+    """
+    Verify rejection if current rate is missing.
+    """
+    try:
+        build_freight_forecast_input({"forecast_7d_usd_day": 20000.0})
+        assert False, "Expected ValueError"
+    except ValueError:
+        pass
+
+
+def test_build_freight_forecast_input_negative_rate():
+    """
+    Verify rejection if any rate is negative.
+    """
+    try:
+        build_freight_forecast_input({
+            "current_rate_usd_day": -500.0,
+        })
+        assert False, "Expected ValueError"
+    except ValueError:
+        pass
+
+
+# ============================================================
+# VESSEL OPTIMIZATION ADAPTER TESTS
+# ============================================================
+
+def test_build_vessel_plan_input_from_nested_rec():
+    """
+    Verify conversion of Member 3 optimization dictionary with nested recommendation.
+    """
+    payload = {
+        "status": "OPTIMAL",
+        "recommendation": {
+            "vessel_class": "Panamax",
+            "dwt_mt": 82500.0,
+            "voyages": 2,
+            "cargo_per_voyage_mt": 40000.0,
+            "capacity_utilization_pct": 95.0,
+        }
+    }
+
+    result = build_vessel_plan_input(payload)
+    assert result.vessel_class == "Panamax"
+    assert result.dwt_mt == 82500.0
+    assert result.voyages == 2
+    assert result.cargo_per_voyage_mt == 40000.0
+    assert result.capacity_utilization_pct == 95.0
+
+
+def test_build_vessel_plan_input_from_flat_dict():
+    """
+    Verify conversion of flat vessel plan dictionary.
+    """
+    payload = {
+        "vessel_class": "Capesize",
+        "dwt_mt": 180000.0,
+        "voyages": 1,
+        "capacity_utilization_pct": 92.0,
+    }
+
+    result = build_vessel_plan_input(payload, cargo_quantity_mt=150000.0)
+    assert result.vessel_class == "Capesize"
+    assert result.dwt_mt == 180000.0
+    assert result.voyages == 1
+    assert result.cargo_per_voyage_mt == 150000.0
+    assert result.capacity_utilization_pct == 92.0
+
+
+def test_build_vessel_plan_input_from_instance():
+    """
+    Verify that passing an existing VesselPlanInput returns it unchanged.
+    """
+    original = VesselPlanInput(
+        vessel_class="Supramax",
+        dwt_mt=58000.0,
+        voyages=1,
+    )
+    result = build_vessel_plan_input(original)
+    assert result is original
+
+
+def test_build_vessel_plan_input_missing_vessel_class():
+    """
+    Verify rejection if vessel class is missing.
+    """
+    try:
+        build_vessel_plan_input({"dwt_mt": 50000.0})
+        assert False, "Expected ValueError"
+    except ValueError:
+        pass
+
+
+def test_build_vessel_plan_input_missing_dwt():
+    """
+    Verify rejection if DWT is missing.
+    """
+    try:
+        build_vessel_plan_input({"vessel_class": "Panamax"})
+        assert False, "Expected ValueError"
+    except ValueError:
+        pass
+
+
