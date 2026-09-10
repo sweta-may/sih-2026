@@ -14,6 +14,7 @@ from smartfreight_ais.cost_decision_engine import (
     calculate_voyage_cost,
     calculate_wait_cost,
     compare_charter_now_vs_wait,
+    build_decision_request_from_member5_bridge,
 )
 
 
@@ -323,3 +324,63 @@ def test_invalid_voyage_duration_is_rejected():
 
     except ValueError:
         pass
+
+
+# ============================================================
+# MEMBER 4 / AIS BRIDGE INTEGRATION TEST
+# ============================================================
+
+def test_build_decision_request_from_member5_bridge():
+    """
+    Verify conversion of Member 4 AIS bridge payload to DecisionRequest.
+    """
+    bridge_payload = {
+        "vessel_class": "Panamax",
+        "distance_to_port_nm": 420.0,
+        "expected_waiting_time_hours": 18.0,
+        "expected_turnaround_time_hours": 30.0,
+        "total_idle_impact_usd": 15000.0,
+        "port_congestion_level": "HIGH",
+    }
+
+    freight = FreightForecastInput(
+        current_rate_usd_day=22832.0,
+        forecast_7d_usd_day=22000.0,
+        forecast_14d_usd_day=21500.0,
+        forecast_30d_usd_day=21000.0,
+    )
+
+    cargo = CargoRequirement(
+        cargo_quantity_mt=75000.0,
+        required_by_date=date(2026, 10, 1),
+        urgency="NORMAL",
+        recurring=False,
+        planned_voyages=1,
+    )
+
+    assumptions = CostAssumptions(
+        bunker_price_usd_per_mt=600.0,
+        fuel_consumption_mt_per_day=50.0,
+        port_cost_usd=25000.0,
+        other_voyage_cost_usd=10000.0,
+        waiting_cost_multiplier=1.0,
+        market_wait_cost_usd_per_day=5000.0,
+    )
+
+    request = build_decision_request_from_member5_bridge(
+        bridge_payload=bridge_payload,
+        freight=freight,
+        cargo=cargo,
+        assumptions=assumptions,
+        dwt_mt=82000.0,
+        voyage_duration_days=5.0,
+    )
+
+    assert request.vessel.vessel_class == "Panamax"
+    assert request.vessel.dwt_mt == 82000.0
+    assert request.vessel.voyages == 1
+    assert request.operations.distance_to_port_nm == 420.0
+    assert request.operations.expected_waiting_time_hours == 18.0
+    assert request.operations.expected_turnaround_time_hours == 30.0
+    assert request.operations.total_idle_impact_usd == 15000.0
+    assert request.operations.port_congestion_level == "HIGH"

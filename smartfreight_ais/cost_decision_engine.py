@@ -1127,3 +1127,143 @@ def compare_charter_now_vs_wait(
                 assumptions.market_wait_cost_usd_per_day,
         },
     )
+
+
+# ============================================================
+# MEMBER 4 / AIS BRIDGE ADAPTER
+# ============================================================
+
+def build_decision_request_from_member5_bridge(
+    bridge_payload: dict,
+    freight: FreightForecastInput,
+    cargo: CargoRequirement,
+    assumptions: CostAssumptions,
+    dwt_mt: float,
+    voyage_duration_days: float,
+    voyages: int = 1,
+    capacity_utilization_pct: float = 100.0,
+    vessel_availability: str = "AVAILABLE",
+) -> DecisionRequest:
+    """
+    Convert the existing Member 4 -> Member 5 bridge payload
+    into a DecisionRequest for the Cost & Charter Decision Engine.
+
+    This function acts as an adapter between the existing AIS/
+    waiting-time pipeline and the Member 5 cost-decision engine.
+
+    Existing bridge fields consumed:
+        vessel_class
+        distance_to_port_nm
+        expected_waiting_time_hours
+        expected_turnaround_time_hours
+        total_idle_impact_usd
+        port_congestion_level
+
+    Additional vessel-planning information is supplied by the
+    vessel-optimization output or caller.
+    """
+
+    if not isinstance(bridge_payload, dict):
+        raise ValueError(
+            "bridge_payload must be a dictionary"
+        )
+
+    required_fields = [
+        "vessel_class",
+        "distance_to_port_nm",
+        "expected_waiting_time_hours",
+        "expected_turnaround_time_hours",
+        "total_idle_impact_usd",
+        "port_congestion_level",
+    ]
+
+    missing_fields = [
+        field
+        for field in required_fields
+        if field not in bridge_payload
+    ]
+
+    if missing_fields:
+        raise ValueError(
+            "Missing required Member 5 bridge fields: "
+            + ", ".join(missing_fields)
+        )
+
+    if dwt_mt <= 0:
+        raise ValueError(
+            "dwt_mt must be greater than zero"
+        )
+
+    if voyage_duration_days <= 0:
+        raise ValueError(
+            "voyage_duration_days must be greater than zero"
+        )
+
+    if voyages <= 0:
+        raise ValueError(
+            "voyages must be greater than zero"
+        )
+
+    operations = OperationalInput(
+        distance_to_port_nm=float(
+            bridge_payload["distance_to_port_nm"]
+        ),
+
+        voyage_duration_days=float(
+            voyage_duration_days
+        ),
+
+        expected_waiting_time_hours=float(
+            bridge_payload[
+                "expected_waiting_time_hours"
+            ]
+        ),
+
+        expected_turnaround_time_hours=float(
+            bridge_payload[
+                "expected_turnaround_time_hours"
+            ]
+        ),
+
+        total_idle_impact_usd=float(
+            bridge_payload[
+                "total_idle_impact_usd"
+            ]
+        ),
+
+        port_congestion_level=str(
+            bridge_payload[
+                "port_congestion_level"
+            ]
+        ),
+
+        vessel_availability=str(
+            vessel_availability
+        ),
+    )
+
+    vessel = VesselPlanInput(
+        vessel_class=str(
+            bridge_payload["vessel_class"]
+        ),
+
+        dwt_mt=float(dwt_mt),
+
+        voyages=int(voyages),
+
+        cargo_per_voyage_mt=float(
+            cargo.cargo_quantity_mt / voyages
+        ),
+
+        capacity_utilization_pct=float(
+            capacity_utilization_pct
+        ),
+    )
+
+    return DecisionRequest(
+        freight=freight,
+        vessel=vessel,
+        operations=operations,
+        cargo=cargo,
+        assumptions=assumptions,
+    )
