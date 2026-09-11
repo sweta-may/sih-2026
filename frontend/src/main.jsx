@@ -865,7 +865,7 @@ function App() {
                 </div>
 
                 <p style={{ fontSize: "12px", color: "var(--text-secondary)", margin: 0, lineHeight: 1.5 }}>
-                  💡 <strong>Timing Intelligence:</strong> Freight rates soften by <strong>{formatRate(spotRateUsd - forecastRateUsd).replace("/ton", "")} per ton</strong> over the next 3–5 days before global tonnage tightening triggers a rebound.
+                  💡 <strong>Timing Intelligence:</strong> {isRateDown ? <>Freight rates soften by <strong>{formatRate(spotRateUsd - forecastRateUsd).replace("/ton", "")} per ton</strong> over the next 3–5 days before global tonnage tightening triggers a rebound.</> : <>Freight rates are projected to rise by <strong>{formatRate(forecastRateUsd - spotRateUsd).replace("/ton", "")} per ton</strong>; charter now to lock in spot rates.</>}
                 </p>
               </section>
 
