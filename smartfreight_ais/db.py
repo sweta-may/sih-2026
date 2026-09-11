@@ -1,8 +1,15 @@
 import os
 import sqlite3
 import pandas as pd
+from pathlib import Path
 
-DATA_DIR = r"c:\Users\SWETA\OneDrive\Desktop\SIH\SmartFreight_POPULATED_Data_Layer"
+_current = Path(__file__).resolve().parent
+_candidates = [
+    _current.parent / "SmartFreight_POPULATED_Data_Layer",
+    _current.parent.parent / "SmartFreight_POPULATED_Data_Layer",
+    Path(r"c:\Users\ADL\Desktop\sih\SmartFreight_POPULATED_Data_Layer"),
+]
+DATA_DIR = str(next((p for p in _candidates if p.exists()), _candidates[0]))
 DB_PATH = os.path.join(DATA_DIR, "smartfreight_populated.db")
 
 def get_connection():
