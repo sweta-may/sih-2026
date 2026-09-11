@@ -1,3 +1,6 @@
+import os
+import sqlite3
+import pandas as pd
 from pathlib import Path
 
 _current = Path(__file__).resolve().parent
