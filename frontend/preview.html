@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartFreight AI — Indian Rupees (₹ INR) Decision Flow</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <style>
+    :root {
+      --surface-1: #ffffff;
+      --surface-2: #f8f9fa;
+      --surface-3: #f1f5f9;
+      --border: #e5e7eb;
+      --border-accent: #7baee8;
+      --radius: 8px;
+      --radius-lg: 12px;
+      --fill-ghost-selected: #e9ecef;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-success: #16a34a;
+      --text-warning: #b45309;
+      --text-danger: #dc2626;
+      --bg-accent: #e0f2fe;
+      --text-accent: #0284c7;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: #f1f3f5;
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .smartfreight-container {
+      width: 100%;
+      max-width: 1040px;
+      background: var(--surface-1);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+      box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 180px minmax(0, 1fr);
+      min-height: 700px;
+    }
+
+    .sidebar {
+      background: var(--surface-1);
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-right: 0.5px solid var(--border);
+      user-select: none;
+      position: sticky;
+      top: 0;
+      max-height: 100vh;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 500;
+      padding: 0 8px 16px;
+      display: flex;
+      align-items: center;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+    .brand-title i { font-size: 16px; margin-right: 6px; vertical-align: -2px; }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border-radius: var(--radius);
+      color: var(--text-secondary);
+      font-size: 13px;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .nav-btn:hover { background: #f3f4f6; color: var(--text-primary); }
+    .nav-btn.active { background: var(--fill-ghost-selected); color: var(--text-primary); font-weight: 500; }
+    .nav-btn.bottom-item { margin-top: auto; }
+
+    .main-panel {
+      background: var(--surface-2);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-row h2 { font-size: 22px; font-weight: 600; margin: 0; }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .currency-toggle {
+      display: flex;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .currency-toggle button {
+      border: none;
+      background: transparent;
+      padding: 4px 8px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-family: inherit;
+    }
+    .currency-toggle button.active {
+      background: var(--fill-ghost-selected);
+      color: var(--text-primary);
+    }
+
+    .avatar-badge {
+      width: 28px; height: 28px; border-radius: 50%; background: var(--bg-accent);
+      display: flex; align-items: center; justify-content: center; font-size: 12px;
+      color: var(--text-accent); font-weight: 500;
+    }
+
+    /* Workflow Strip */
+    .workflow-strip {
+      background: var(--surface-1);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+    }
+    .strip-item {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+    .strip-item:hover { background: var(--surface-3); color: var(--text-primary); }
+    .strip-item.active { background: var(--bg-accent); color: var(--text-accent); font-weight: 600; }
+
+    /* Flow Cards */
+    .flow-card {
+      background: var(--surface-1);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .flow-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 0.5px solid var(--border);
+      padding-bottom: 10px;
+    }
+    .flow-title {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .flow-title i { color: var(--text-accent); font-size: 18px; }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+    .badge.ready { background: #dcfce7; color: #15803d; }
+    .badge.warn { background: #fef3c7; color: #b45309; }
+
+    /* Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .form-group label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .form-group input, .form-group select {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-family: inherit;
+      background: #fff;
+    }
+
+    .preset-chips { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+    .chip {
+      font-size: 10px; padding: 2px 6px; border-radius: 4px; background: var(--surface-2);
+      border: 0.5px solid var(--border); cursor: pointer; color: var(--text-secondary);
+    }
+    .chip.active { background: var(--fill-ghost-selected); color: var(--text-primary); font-weight: 600; }
+
+    /* Metrics Row */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .metric-card {
+      background: var(--surface-1);
+      border-radius: var(--radius);
+      padding: 12px;
+      border: 0.5px solid var(--border);
+    }
+    .metric-card p.label { font-size: 12px; color: var(--text-secondary); }
+    .metric-card p.val { font-size: 20px; font-weight: 500; margin-top: 4px; }
+    .metric-card p.val.green { color: var(--text-success); }
+
+    /* Multi Horizon */
+    .horizons-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .horizon-box {
+      background: var(--surface-2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      text-align: center;
+    }
+    .horizon-box.highlight {
+      background: #f0f7ff;
+      border-color: var(--border-accent);
+    }
+
+    /* Compat Grid */
+    .compat-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 12px;
+    }
+    .compat-card {
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      padding: 12px;
+      border: 0.5px solid var(--border);
+    }
+    .compat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 5px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .compat-row:last-child { border-bottom: none; }
+
+    /* Stepper */
+    .stepper-box {
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      padding: 14px;
+      border: 0.5px solid var(--border);
+    }
+    .stepper-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+      position: relative;
+    }
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 4px;
+    }
+    .step-circle {
+      width: 20px; height: 20px; border-radius: 50%; background: #cbd5e1;
+      color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
+    .step-circle.done { background: #10b981; }
+    .step-circle.active { background: #2563eb; }
+
+    /* Middle Grid */
+    .middle-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 16px;
+    }
+    .map-box {
+      background: var(--surface-1);
+      border-radius: var(--radius);
+      padding: 12px;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 0.5px solid var(--border);
+      text-align: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .recommendation-card {
+      background: var(--surface-1);
+      border: 2px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn-analysis {
+      margin-top: auto;
+      background: #fff;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Cost Table */
+    .cost-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .cost-table th, .cost-table td {
+      padding: 8px 10px;
+      border-bottom: 0.5px solid var(--border);
+      text-align: left;
+    }
+    .cost-table tr.total td {
+      font-weight: 700;
+      background: var(--surface-2);
+      border-top: 1px solid var(--border);
+    }
+
+    /* Decision Banner */
+    .decision-banner {
+      background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+      border: 2px solid var(--border-accent);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .decision-boxes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .d-box {
+      background: #fff;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .d-box.green { background: #f0fdf4; border-color: var(--text-success); }
+
+    /* Contract */
+    .contract-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .contract-box {
+      background: var(--surface-2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+    }
+    .clause-box {
+      background: #fffbeb;
+      border: 0.5px solid #fde68a;
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #92400e;
+      line-height: 1.45;
+    }
+
+    .btn-action {
+      background: #0f172a;
+      color: #fff;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .sidebar { position: relative; max-height: none; }
+      .form-grid, .metrics-row, .middle-grid, .compat-grid, .decision-boxes, .contract-grid { grid-template-columns: 1fr; }
+      .stepper-row { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="smartfreight-container">
+  <div class="dashboard-grid">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar">
+      <div class="brand-title">
+        <i class="ti ti-anchor"></i>SmartFreight
+      </div>
+      <button class="nav-btn active" onclick="scrollToId('step-1')"><i class="ti ti-home"></i><span>Dashboard</span></button>
+      <button class="nav-btn" onclick="scrollToId('step-1')"><i class="ti ti-plus"></i><span>New voyage</span></button>
+      <button class="nav-btn" onclick="scrollToId('step-2')"><i class="ti ti-chart-line"></i><span>Freight forecast</span></button>
+      <button class="nav-btn" onclick="scrollToId('step-3')"><i class="ti ti-ship"></i><span>Vessel optimization</span></button>
+      <button class="nav-btn" onclick="scrollToId('step-4')"><i class="ti ti-map-2"></i><span>Tracking</span></button>
+      <button class="nav-btn" onclick="scrollToId('step-5')"><i class="ti ti-anchor"></i><span>Port and congestion</span></button>
+      <button class="nav-btn" onclick="scrollToId('step-6')"><i class="ti ti-report"></i><span>Cost & Decision</span></button>
+      <button class="nav-btn" onclick="scrollToId('step-8')"><i class="ti ti-shield-check"></i><span>Contract terms</span></button>
+      <button class="nav-btn bottom-item" onclick="alert('SmartFreight One-Page Flow Active')"><i class="ti ti-settings"></i><span>Settings</span></button>
+    </div>
+
+    <!-- RIGHT MAIN PANEL -->
+    <div class="main-panel">
+      <!-- HEADER -->
+      <div class="header-row">
+        <div>
+          <h2>Overview</h2>
+          <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+            One-Page Decision Flow: Cargo ➔ Vessel ➔ Trend ➔ Port ➔ Cost ➔ Decision ➔ Contract (All in ₹ INR)
+          </p>
+        </div>
+        <div class="header-actions">
+          <div class="currency-toggle">
+            <button class="active" id="btn-inr" onclick="setCurrency('INR')">₹ INR</button>
+            <button id="btn-usd" onclick="setCurrency('USD')">$ USD</button>
+          </div>
+          <div class="avatar-badge">PA</div>
+        </div>
+      </div>
+
+      <!-- WORKFLOW QUICK STRIP -->
+      <div class="workflow-strip">
+        <div class="strip-item active" onclick="scrollToId('step-1')">① Voyage</div>
+        <div class="strip-item" onclick="scrollToId('step-2')">② Freight Trend</div>
+        <div class="strip-item" onclick="scrollToId('step-3')">③ Vessel & Port</div>
+        <div class="strip-item" onclick="scrollToId('step-4')">④ Tracking & ETA</div>
+        <div class="strip-item" onclick="scrollToId('step-5')">⑤ Port Queue</div>
+        <div class="strip-item" onclick="scrollToId('step-6')">⑥ Total Cost</div>
+        <div class="strip-item" onclick="scrollToId('step-7')">⑦ ⭐ Decision</div>
+        <div class="strip-item" onclick="scrollToId('step-8')">⑧ Contract</div>
+      </div>
+
+      <!-- STEP 1: ENTER VOYAGE DETAILS -->
+      <div id="step-1" class="flow-card">
+        <div class="flow-header">
+          <div class="flow-title"><i class="ti ti-box"></i>Step 1: Enter Voyage Details</div>
+          <span class="badge ready">● Active</span>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Cargo Type</label>
+            <select id="inp-cargo" onchange="recalculate()">
+              <option>Iron Ore</option>
+              <option>Thermal Coal</option>
+              <option>Coking Coal</option>
+              <option>Bauxite</option>
+              <option>Grain</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Cargo Quantity (MT)</label>
+            <input type="number" id="inp-mt" value="55000" step="5000" onchange="recalculate()">
+            <div class="preset-chips">
+              <span class="chip" onclick="setMt(35000)">35k (Handy)</span>
+              <span class="chip active" id="chip-55" onclick="setMt(55000)">55k (Supra)</span>
+              <span class="chip" id="chip-75" onclick="setMt(75000)">75k (Pana)</span>
+              <span class="chip" id="chip-170" onclick="setMt(170000)">170k (Cape)</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Target Laycan Date</label>
+            <input type="date" value="2026-09-15" id="inp-date">
+          </div>
+          <div class="form-group">
+            <label>Loading Port</label>
+            <select id="inp-load" onchange="recalculate()">
+              <option value="INPRD">Paradip (Draft 16.5m)</option>
+              <option value="INVTZ">Visakhapatnam (Draft 18.1m)</option>
+              <option value="INHAL">Haldia (Draft 12.2m)</option>
+              <option value="INDHM">Dhamra (Draft 18.0m)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Discharge Port</label>
+            <select id="inp-disch" onchange="recalculate()">
+              <option value="SGSIN">Singapore (1,650 NM)</option>
+              <option value="CNQIN">Qingdao, China (3,420 NM)</option>
+              <option value="MYPKG">Port Klang, Malaysia (1,480 NM)</option>
+              <option value="NLRTM">Rotterdam (6,850 NM)</option>
+            </select>
+          </div>
+          <div class="form-group" style="justify-content:flex-end;">
+            <button class="btn-action" style="width:100%;" onclick="scrollToId('step-2')">Run AI Analysis →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: VIEW FREIGHT TREND & BEST CHARTERING TIME -->
+      <div id="step-2" class="flow-card">
+        <div class="flow-header">
+          <div class="flow-title"><i class="ti ti-chart-line"></i>Step 2: Freight Trend & Best Chartering Time</div>
+          <span class="badge ready">● In Indian Rupees (₹)</span>
+        </div>
+        <div class="metrics-row">
+          <div class="metric-card">
+            <p class="label">Freight rate</p>
+            <p class="val" id="disp-spot-rate">₹2,046/ton</p>
+          </div>
+          <div class="metric-card">
+            <p class="label">Forecast</p>
+            <p class="val green"><span id="disp-forecast-rate">₹1,904/ton</span> <i class="ti ti-arrow-down-right" style="font-size:14px;"></i></p>
+          </div>
+          <div class="metric-card">
+            <p class="label">Active vessels</p>
+            <p class="val" id="disp-active-vessels">12</p>
+          </div>
+          <div class="metric-card">
+            <p class="label">Avg waiting</p>
+            <p class="val" id="disp-avg-wait">18 hrs</p>
+          </div>
+        </div>
+        <div class="horizons-row">
+          <div class="horizon-box">
+            <p style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">7-Day Horizon</p>
+            <p style="font-size:18px; font-weight:600; margin:4px 0;" id="disp-7d">₹1,954/ton</p>
+            <span style="font-size:11px; color:var(--text-success);">↓ 4.5% vs spot</span>
+          </div>
+          <div class="horizon-box highlight">
+            <p style="font-size:11px; color:var(--text-accent); text-transform:uppercase; font-weight:600;">14-Day (Optimal Window)</p>
+            <p style="font-size:18px; font-weight:600; margin:4px 0; color:var(--text-accent);" id="disp-14d">₹1,904/ton</p>
+            <span style="font-size:11px; color:var(--text-accent);">↓ 6.9% dip — Best Entry</span>
+          </div>
+          <div class="horizon-box">
+            <p style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">30-Day Horizon</p>
+            <p style="font-size:18px; font-weight:600; margin:4px 0;" id="disp-30d">₹2,013/ton</p>
+            <span style="font-size:11px; color:var(--text-success);">↓ 1.6%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: RECOMMENDED VESSEL & PORT COMPATIBILITY -->
+      <div id="step-3" class="flow-card">
+        <div class="flow-header">
+          <div class="flow-title"><i class="ti ti-ship"></i>Step 3: Recommended Vessel & Port Compatibility</div>
+          <span class="badge ready" id="disp-compat-badge">✅ 100% Compatible</span>
+        </div>
+        <div class="compat-grid">
+          <div class="compat-card">
+            <p style="font-weight:600; font-size:13px; margin-bottom:6px;" id="disp-vessel-title">Recommended: Supramax (55,000 DWT)</p>
+            <div class="compat-row"><span>Optimal Parcel</span><span style="font-weight:600;" id="disp-parcel-mt">55,000 MT (98% Stowage)</span></div>
+            <div class="compat-row"><span>Dimensions</span><span id="disp-vessel-dims">LOA 190m · Beam 32.2m · Draft 12.8m</span></div>
+            <div class="compat-row"><span>Daily Fuel Burn</span><span id="disp-vessel-fuel">18.2 MT/day VLSFO @ 11.5 kts</span></div>
+          </div>
+          <div class="compat-card">
+            <p style="font-weight:600; font-size:13px; margin-bottom:6px;" id="disp-port-title">Port Screening: Paradip (16.5m)</p>
+            <div class="compat-row"><span>Loading Draft Clearance</span><span style="color:var(--text-success); font-weight:600;" id="disp-draft-status">+3.7m Safe Under-Keel</span></div>
+            <div class="compat-row"><span>Berth LOA Allowance</span><span style="color:var(--text-success); font-weight:600;">+110m Berth Clear</span></div>
+            <div class="compat-row"><span>Discharge Draft</span><span style="color:var(--text-success); font-weight:600;">Singapore (Draft 18.5m OK)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: TRACK VESSEL & ETA -->
+      <div id="step-4" class="flow-card">
+        <div class="flow-header">
+          <div class="flow-title"><i class="ti ti-map-pin"></i>Step 4: Track Vessel & ETA</div>
+          <span class="badge ready">● AIS Tracking Feed</span>
+        </div>
+        <div class="stepper-box">
+          <p style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;" id="disp-track-sub">
+            Assigned: MV OCEAN PIONEER (MMSI: 419001244) · Speed: 11.4 kts · Distance: 142.5 NM
+          </p>
+          <div class="stepper-row">
+            <div class="step-item"><div class="step-circle done">✓</div><span style="font-size:11px;">On Time</span></div>
+            <div class="step-item"><div class="step-circle done">✓</div><span style="font-size:11px;">Delayed</span></div>
+            <div class="step-item"><div class="step-circle active">3</div><span style="font-size:11px; font-weight:700; color:#2563eb;">At Port Area</span></div>
+            <div class="step-item"><div class="step-circle">4</div><span style="font-size:11px;">Waiting</span></div>
+            <div class="step-item"><div class="step-circle">5</div><span style="font-size:11px;">Loading</span></div>
+            <div class="step-item"><div class="step-circle">6</div><span style="font-size:11px;">Departed</span></div>
+          </div>
+        </div>
+
+        <div class="middle-grid">
+          <div class="map-box">
+            <div>
+              <i class="ti ti-map-2" style="font-size:26px;"></i>
+              <p style="font-size:13px; margin-top:8px;">Live vessel tracking map</p>
+            </div>
+          </div>
+          <div class="recommendation-card">
+            <span style="background:var(--bg-accent); color:var(--text-accent); font-size:11px; padding:2px 8px; border-radius:var(--radius); width:fit-content; font-weight:500;">Recommendation</span>
+            <p style="font-size:15px; font-weight:500; margin:0;" id="rec-headline-box">Wait 3 to 5 days for a better window</p>
+            <p style="font-size:12px; color:var(--text-secondary); margin:0;" id="rec-vessel-box">Supramax, 55000 DWT</p>
+            <p style="font-size:12px; color:var(--text-secondary); margin:0;" id="rec-saving-box">Expected saving ₹66.8 Lakh</p>
+            <button class="btn-analysis" onclick="scrollToId('step-7')">View full analysis</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: SEE PORT WAITING / TURNAROUND STATUS -->
+      <div id="step-5" class="flow-card">
+        <div class="flow-header">
+          <div class="flow-title"><i class="ti ti-clock"></i>Step 5: Port Waiting / Turnaround Status</div>
+          <span class="badge warn" id="disp-cong-badge">Moderate</span>
+        </div>
+        <div class="metrics-row">
+          <div class="metric-card"><p class="label">Port Queue</p><p class="val" id="disp-queue">12 vessels</p></div>
+          <div class="metric-card"><p class="label">Predicted Wait</p><p class="val" id="disp-wait-hours">18 hrs</p></div>
+          <div class="metric-card"><p class="label">Turnaround Time</p><p class="val" id="disp-turnaround">64 hrs</p></div>
+          <div class="metric-card"><p class="label">Transit Days</p><p class="val" id="disp-transit">6.0 days</p></div>
+        </div>
+      </div>
+
+      <!-- STEP 6: VIEW TOTAL VOYAGE COST IN INR -->
+      <div id="step-6" class="flow-card">
+        <div class="flow-header">
+          <div class="flow-title"><i class="ti ti-currency-rupee"></i>Step 6: View Total Voyage Cost (₹ INR)</div>
+          <span class="badge ready">● In Indian Rupees</span>
+        </div>
+        <table class="cost-table">
+          <thead>
+            <tr>
+              <th>Cost Item</th>
+              <th>Calculation Basis</th>
+              <th>Charter Now</th>
+              <th>Delayed Entry (Wait)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Freight Hire</strong></td>
+              <td id="cost-cargo-basis">55,000 MT @ spot vs forecast</td>
+              <td id="cost-freight-now">₹11,25,16,250</td>
+              <td style="color:var(--text-success); font-weight:600;" id="cost-freight-wait">₹10,47,09,000</td>
+            </tr>
+            <tr>
+              <td><strong>Sea Bunker Fuel</strong></td>
+              <td>1,650 NM transit @ ₹50,100/MT VLSFO</td>
+              <td id="cost-fuel">₹56,98,875</td>
+              <td id="cost-fuel-w">₹56,98,875</td>
+            </tr>
+            <tr>
+              <td><strong>Port Tariffs</strong></td>
+              <td>Port authority dues & pilotage</td>
+              <td id="cost-port">₹69,30,500</td>
+              <td id="cost-port-w">₹69,30,500</td>
+            </tr>
+            <tr>
+              <td><strong>Demurrage / Idle Risk</strong></td>
+              <td>Anchorage waiting exposure</td>
+              <td id="cost-demurrage">₹9,39,375</td>
+              <td style="color:var(--text-success);" id="cost-demurrage-w">₹3,75,750 (Queue clears)</td>
+            </tr>
+            <tr class="total">
+              <td>TOTAL VOYAGE COST</td>
+              <td>All Included</td>
+              <td id="cost-total-now">₹10.44 Cr</td>
+              <td style="color:var(--text-success); font-size:16px;" id="cost-total-wait">₹9.77 Cr</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- STEP 7: ⭐ CHARTER NOW / WAIT DECISION MILESTONE IN INR -->
+      <div id="step-7" class="decision-banner">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="background:#fef3c7; color:#b45309; padding:4px 12px; border-radius:999px; font-weight:700; font-size:13px;" id="disp-signal-badge">
+            ⭐ MARKET SIGNAL: WAIT
+          </div>
+          <div style="font-size:20px; font-weight:700; color:var(--text-success);" id="disp-savings-text">
+            Net Savings: ₹66.8 Lakh
+          </div>
+        </div>
+        <div>
+          <h3 style="font-size:18px; margin-bottom:4px;" id="disp-decision-title">Recommendation: Wait 3 to 5 days for a better window</h3>
+          <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;" id="disp-decision-desc">
+            AI Random Forest model indicates dry bulk rate softening by -6.9% combined with easing anchorage congestion at Paradip. Fixturing between Sept 15 and 18 saves ₹66.8 Lakh.
+          </p>
+        </div>
+        <div class="decision-boxes">
+          <div class="d-box">
+            <span style="color:var(--text-secondary);">Charter now</span>
+            <span style="font-size:18px; font-weight:700;" id="comp-now">₹10.44 Cr</span>
+          </div>
+          <div class="d-box green">
+            <span style="color:var(--text-secondary);">Wait (Optimal Window)</span>
+            <span style="font-size:18px; font-weight:700; color:var(--text-success);" id="comp-wait">₹9.77 Cr</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 8: RECOMMENDED CONTRACT IN INR -->
+      <div id="step-8" class="flow-card">
+        <div class="flow-header">
+          <div class="flow-title"><i class="ti ti-file-certificate"></i>Step 8: Recommended Contract & Terms</div>
+          <span class="badge ready">● Form: Gencon 94</span>
+        </div>
+        <div class="contract-grid">
+          <div class="contract-box">
+            <p style="font-size:11px; text-transform:uppercase; color:var(--text-secondary);">Contract Option</p>
+            <p style="font-size:13px; font-weight:600; margin-top:2px;">Spot Voyage Charter (Gencon 94)</p>
+          </div>
+          <div class="contract-box">
+            <p style="font-size:11px; text-transform:uppercase; color:var(--text-secondary);">Agreed Freight Rate</p>
+            <p style="font-size:13px; font-weight:600; margin-top:2px;" id="disp-contract-rate">₹1,904 / MT FIOST</p>
+          </div>
+          <div class="contract-box">
+            <p style="font-size:11px; text-transform:uppercase; color:var(--text-secondary);">Laytime Allowed</p>
+            <p style="font-size:13px; font-weight:600; margin-top:2px;" id="disp-contract-laytime">4.5 WWD</p>
+          </div>
+          <div class="contract-box">
+            <p style="font-size:11px; text-transform:uppercase; color:var(--text-secondary);">Demurrage / Despatch</p>
+            <p style="font-size:13px; font-weight:600; margin-top:2px;" id="disp-contract-demurrage">₹12.52 Lakh / day · 50% Despatch</p>
+          </div>
+        </div>
+        <div class="clause-box">
+          📜 <strong>Protective Clause:</strong> Notice of Readiness (NOR) shall be tendered whether in berth or not (WIBON) or whether in port or not (WIPON). Time counts 6 hours after NOR tender to protect charterer from anchorage idling.
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-action" onclick="copyTermSheet()"><i class="ti ti-copy"></i> Copy Chartering Term Sheet (₹)</button>
+          <button class="btn-action" style="background:#16a34a;" onclick="alert('Fixture Locked In! Proceeding with contract drafting.')">Proceed with Recommended Contract →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentCurrency = "INR";
+  const USD_INR = 83.5;
+
+  const PORTS = {
+    INPRD: { name: "Paradip", draft: 16.5, loa: 300, wait: 18, queue: 12, cong: "Moderate", dues: 48000 },
+    INVTZ: { name: "Visakhapatnam", draft: 18.1, loa: 300, wait: 36, queue: 8, cong: "High", dues: 52000 },
+    INHAL: { name: "Haldia", draft: 12.2, loa: 239, wait: 14, queue: 15, cong: "Low", dues: 38000 },
+    INDHM: { name: "Dhamra", draft: 18.0, loa: 350, wait: 12, queue: 7, cong: "Low", dues: 45000 },
+  };
+
+  const VESSELS = {
+    Handysize: { dwt: 38200, loa: 180, draft: 10.5, speed: 11.0, fuel: 14.5, dem: 12000, spot: 19.5, wait: 18.9, vname: "MV EASTERN PRIDE", mmsi: "419003501" },
+    Supramax: { dwt: 55000, loa: 190, draft: 12.8, speed: 11.5, fuel: 18.2, dem: 15000, spot: 24.5, wait: 22.8, vname: "MV OCEAN PIONEER", mmsi: "419001244" },
+    Panamax: { dwt: 75000, loa: 229, draft: 14.4, speed: 12.0, fuel: 22.5, dem: 18500, spot: 26.8, wait: 27.4, vname: "MV BENGAL GLORY", mmsi: "419001889" },
+    Capesize: { dwt: 180000, loa: 290, draft: 18.2, speed: 12.5, fuel: 32.0, dem: 28000, spot: 31.2, wait: 28.5, vname: "MV VIZAG LEADER", mmsi: "419002130" },
+  };
+
+  function setCurrency(c) {
+    currentCurrency = c;
+    document.getElementById("btn-inr").classList.toggle("active", c === "INR");
+    document.getElementById("btn-usd").classList.toggle("active", c === "USD");
+    recalculate();
+  }
+
+  function fmtRate(usdPerTon) {
+    if (currentCurrency === "INR") {
+      return `₹${Math.round(usdPerTon * USD_INR).toLocaleString("en-IN")}/ton`;
+    }
+    return `$${usdPerTon.toFixed(1)}/ton`;
+  }
+
+  function fmtExec(usdVal) {
+    if (currentCurrency === "INR") {
+      const inr = usdVal * USD_INR;
+      if (inr >= 10000000) return `₹${(inr / 10000000).toFixed(2)} Cr`;
+      if (inr >= 100000) return `₹${(inr / 100000).toFixed(1)} Lakh`;
+      return `₹${Math.round(inr).toLocaleString("en-IN")}`;
+    }
+    if (usdVal >= 1000000) return `$${(usdVal / 1000000).toFixed(2)}M`;
+    if (usdVal >= 1000) return `$${Math.round(usdVal / 1000)}K`;
+    return `$${Math.round(usdVal).toLocaleString("en-US")}`;
+  }
+
+  function fmtExact(usdVal) {
+    if (currentCurrency === "INR") {
+      return `₹${Math.round(usdVal * USD_INR).toLocaleString("en-IN")}`;
+    }
+    return `$${Math.round(usdVal).toLocaleString("en-US")}`;
+  }
+
+  function setMt(mt) {
+    document.getElementById("inp-mt").value = mt;
+    document.querySelectorAll(".preset-chips .chip").forEach(c => c.classList.remove("active"));
+    if (mt === 55000) document.getElementById("chip-55")?.classList.add("active");
+    if (mt === 75000) document.getElementById("chip-75")?.classList.add("active");
+    if (mt === 170000) document.getElementById("chip-170")?.classList.add("active");
+    recalculate();
+  }
+
+  function recalculate() {
+    const mt = Number(document.getElementById("inp-mt").value) || 55000;
+    const portId = document.getElementById("inp-load").value;
+    const p = PORTS[portId] || PORTS.INPRD;
+
+    let vType = "Supramax";
+    if (mt <= 42000) vType = "Handysize";
+    else if (mt <= 65000) vType = "Supramax";
+    else if (mt <= 100000) vType = "Panamax";
+    else vType = "Capesize";
+
+    const v = VESSELS[vType];
+
+    // Rates
+    document.getElementById("disp-spot-rate").innerText = fmtRate(v.spot);
+    document.getElementById("disp-forecast-rate").innerText = fmtRate(v.wait);
+    document.getElementById("disp-active-vessels").innerText = p.queue;
+    document.getElementById("disp-avg-wait").innerText = `${p.wait} hrs`;
+    document.getElementById("disp-7d").innerText = fmtRate(v.spot * 0.955);
+    document.getElementById("disp-14d").innerText = fmtRate(v.wait);
+    document.getElementById("disp-30d").innerText = fmtRate(v.spot * 0.984);
+
+    // Vessel & Port
+    document.getElementById("disp-vessel-title").innerText = `Recommended: ${vType} (${v.dwt.toLocaleString()} DWT)`;
+    document.getElementById("disp-parcel-mt").innerText = `${mt.toLocaleString()} MT (98% Stowage)`;
+    document.getElementById("disp-vessel-dims").innerText = `LOA ${v.loa}m · Draft ${v.draft}m`;
+    document.getElementById("disp-vessel-fuel").innerText = `${v.fuel} MT/day VLSFO @ ${v.speed} kts`;
+    document.getElementById("disp-port-title").innerText = `Port Screening: ${p.name} (${p.draft}m max draft)`;
+
+    const draftDiff = p.draft - v.draft;
+    const draftStatus = draftDiff >= 0.5 ? `+${draftDiff.toFixed(1)}m Safe Under-Keel` : `Draft Exceeded (-${Math.abs(draftDiff).toFixed(1)}m)`;
+    document.getElementById("disp-draft-status").innerText = draftStatus;
+    document.getElementById("disp-draft-status").style.color = draftDiff >= 0.5 ? "var(--text-success)" : "var(--text-danger)";
+
+    // Tracking
+    document.getElementById("disp-track-sub").innerText = `Assigned: ${v.vname} (MMSI: ${v.mmsi}) · Speed: ${v.speed} kts`;
+
+    // Port queue
+    document.getElementById("disp-queue").innerText = `${p.queue} vessels`;
+    document.getElementById("disp-wait-hours").innerText = `${p.wait} hrs`;
+    document.getElementById("disp-turnaround").innerText = `${Math.round(p.wait + (mt / 22000) * 24)} hrs`;
+    document.getElementById("disp-transit").innerText = `${(1650 / (v.speed * 24)).toFixed(1)} days`;
+
+    // Costs
+    const freightSpot = mt * v.spot;
+    const freightWait = mt * v.wait;
+    const fuelCost = Math.round((1650 / (v.speed * 24)) * v.fuel * 600);
+    const demurrage = Math.round((p.wait / 24) * v.dem);
+    const totalNow = freightSpot + fuelCost + p.dues + 35000 + demurrage;
+    const totalWait = freightWait + fuelCost + p.dues + 35000 + (demurrage * 0.4);
+    const savings = Math.max(0, totalNow - totalWait);
+
+    const nowFormatted = fmtExec(totalNow);
+    const waitFormatted = fmtExec(totalWait);
+    const savingsFormatted = fmtExec(savings);
+
+    document.getElementById("cost-cargo-basis").innerText = `${mt.toLocaleString()} MT @ spot vs forecast`;
+    document.getElementById("cost-freight-now").innerText = fmtExact(freightSpot);
+    document.getElementById("cost-freight-wait").innerText = fmtExact(freightWait);
+    document.getElementById("cost-fuel").innerText = fmtExact(fuelCost);
+    document.getElementById("cost-fuel-w").innerText = fmtExact(fuelCost);
+    document.getElementById("cost-demurrage").innerText = fmtExact(demurrage);
+    document.getElementById("cost-total-now").innerText = nowFormatted;
+    document.getElementById("cost-total-wait").innerText = waitFormatted;
+
+    // Recommendation card
+    document.getElementById("rec-headline-box").innerText = v.wait < v.spot ? "Wait 3 to 5 days for a better window" : "Charter now before rate increase";
+    document.getElementById("rec-vessel-box").innerText = `${vType}, ${v.dwt} DWT`;
+    document.getElementById("rec-saving-box").innerText = `Expected saving ${savingsFormatted}`;
+
+    // Decision Hero
+    document.getElementById("comp-now").innerText = nowFormatted;
+    document.getElementById("comp-wait").innerText = waitFormatted;
+    document.getElementById("disp-savings-text").innerText = `Net Savings: ${savingsFormatted}`;
+    document.getElementById("disp-contract-rate").innerText = fmtRate(v.wait).replace("/ton", " / MT FIOST");
+    document.getElementById("disp-contract-demurrage").innerText = `${fmtExec(v.dem)} / day · 50% Despatch`;
+    document.getElementById("disp-contract-laytime").innerText = `${(mt / 12000).toFixed(1)} WWD`;
+  }
+
+  function scrollToId(id) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function copyTermSheet() {
+    const text = `SMARTFREIGHT CHARTERING TERM SHEET (${currentCurrency})\n----------------------------------------\nCargo: ${document.getElementById("inp-mt").value} MT ${document.getElementById("inp-cargo").value}\nFreight Rate: ${document.getElementById("disp-forecast-rate").innerText}\nTotal Estimated Cost: ${document.getElementById("comp-wait").innerText}\nNet Savings: ${document.getElementById("disp-savings-text").innerText}`;
+    navigator.clipboard?.writeText(text);
+    alert("Term Sheet copied to clipboard!\n\n" + text);
+  }
+</script>
+
+</body>
+</html>

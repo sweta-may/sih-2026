@@ -12,8 +12,9 @@ from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
 
-DATA_FILE = BASE / "freight_feature_engineered_full.csv"
-
+DATA_FILE = BASE / "data" / "processed" / "freight_feature_engineered_full.csv"
+if not DATA_FILE.exists():
+    DATA_FILE = BASE / "freight_feature_engineered_full.csv"
 
 # ============================================================
 # LOAD FEATURE-ENGINEERED DATA
@@ -30,14 +31,14 @@ except Exception as e:
 # LOAD RANDOM FOREST MODELS
 # ============================================================
 
+MODELS_DIR = BASE / "models" if (BASE / "models").exists() else BASE
+
 try:
-
     MODELS = {
-        7: joblib.load(BASE / "random_forest_7d.pkl"),
-        14: joblib.load(BASE / "random_forest_14d.pkl"),
-        30: joblib.load(BASE / "random_forest_30d.pkl")
+        7: joblib.load(MODELS_DIR / "random_forest_7d.pkl"),
+        14: joblib.load(MODELS_DIR / "random_forest_14d.pkl"),
+        30: joblib.load(MODELS_DIR / "random_forest_30d.pkl")
     }
-
 except Exception as e:
     raise RuntimeError(f"Could not load Random Forest models: {e}")
 
