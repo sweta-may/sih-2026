@@ -749,12 +749,13 @@ function App() {
 
                   <div className="form-item">
                     <label>Cargo Quantity (MT)</label>
-                    <input
-                      type="number"
-                      value={cargoMt}
-                      step={5000}
-                      onChange={(e) => setCargoMt(Number(e.target.value))}
-                    />
+<input
+  type="number"
+  min={1}
+  value={cargoMt}
+  step={5000}
+  onChange={(e) => setCargoMt(Math.max(1, Number(e.target.value) || 1))}
+/>
                     <div className="preset-chips">
                       <span className={`preset-chip ${cargoMt === 35000 ? "active" : ""}`} onClick={() => setCargoMt(35000)}>35k (Handy)</span>
                       <span className={`preset-chip ${cargoMt === 55000 ? "active" : ""}`} onClick={() => setCargoMt(55000)}>55k (Supra)</span>
